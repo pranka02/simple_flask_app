@@ -12,8 +12,6 @@ oauth==1.0.1
 oauthlib==2.0.6
 pickleshare==0.7.5
 pycurl==7.43.0.1
-Pygments==2.3.1
-pygobject==3.26.1
 pyinotify==0.9.6
 PyJWT==1.5.3
 pymacaroons==0.13.0
