@@ -20,26 +20,19 @@ app.config['output_filename'] ='output.json'
 
 
 # Authorisation
-auth = HTTPBasicAuth()
+auth = BasicAuth(app)
 
-users = {
-    "Super": "Priyanka",
-    "User": "Revolut"
-}
+app.config['BASIC_AUTH_USERNAME'] = 'User'
+app.config['BASIC_AUTH_PASSWORD'] = 'Revolut'
 
-@auth.get_password
-def get_pw(username):
-    if username in users:
-        return users.get(username)
-    return None
+basic_auth = BasicAuth(app)
 
 @app.route('/')
-@auth.login_required
+@basic_auth.required
 def index():
-    return render_template("index.html")
+    return render_template('index.html')
 
 # Helper functions
-
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
 	return send_from_directory(app.config['upload_path'],filename)
@@ -72,6 +65,7 @@ def save_json_file(nest_dict):
 
 
 @app.route('/output/<filename>',methods=['GET','POST'])
+@basic_auth.required
 def download_output_file(filename):
     if request.method =='POST' and 'Download':
         return send_from_directory(app.config['output_path'],filename )
@@ -79,6 +73,7 @@ def download_output_file(filename):
 
 
 @app.route('/', methods=['GET','POST'])
+@basic_auth.required
 def upload_input_file():
     if request.method == 'POST' and 'input':
         # check if the post request has the file part
@@ -106,6 +101,7 @@ def upload_input_file():
 
 
 @app.route('/output', methods=['GET','POST'])
+@basic_auth.required
 def nest_dictionary():
     params_list = request.form['input']
 
@@ -120,9 +116,7 @@ def nest_dictionary():
             return redirect(url_for('index'))
 
         key_levels = strip_space(params_list)
-
         all_levels = list(data[0].keys())
-        leaf_levels = list(set(all_levels)-set(key_levels))
 
         if not key_levels:
             flash('Space cannot be entered as parameters. Enter "none" for no nesting')
@@ -138,22 +132,10 @@ def nest_dictionary():
 
 
         elif len(key_levels) <=len(all_levels):
-            
-            nd = utils.nested_dict()
-            for flat_dict in data:
-                level_keys =[]
-                diff_keys ={}
-                for level in key_levels:
-                    level_keys.append(flat_dict[level])
-                for lf in leaf_levels:
-                    diff_keys[lf] =flat_dict[lf]
-                
-                utils.nested_dict_update(nd,level_keys)
-                if diff_keys:
-                    utils.set_leaf_node(nd,level_keys[-1],[diff_keys])
+            nested_dict = utils.make_nested_dictionary(data,all_levels,key_levels)
 
-            save_json_file(nd)
-            return render_template("output.html",result = nd,params =params_list)
+            save_json_file(nested_dict)
+            return render_template("output.html",result = nested_dict,params =params_list)
     else:
             flash('Please enter nesting parameters.')
             return redirect(url_for('index'))

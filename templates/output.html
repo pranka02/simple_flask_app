@@ -19,12 +19,13 @@
     
     <div class="wholepane">
         <div class="post-description">
-            <h1> Nested Dictionaries </h1>
-            <h4> {{result}}</h4>
-            <h3> Parameters passed = {{params}}<h3>
+            <h2> Nested Dictionaries </h2>
+            <p>{{result}}</p>
+            <p> Parameters passed = {{params}} </p>
         </div>
-
+        <br>
         <div class="post-description">
+            <p> View and download output as JSON </p>
             <form method =post action = "{{url_for('download_output_file',filename='output.json')}}" >
             <input class = "press" type="submit" value=Download></input>
         </div>
