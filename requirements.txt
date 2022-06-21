@@ -7,7 +7,7 @@ Flask-HTTPAuth==3.2.4
 Flask-HTTPBasicAuth==1.0.1
 imutils==0.5.2
 jsonschema==3.0.1
-numpy==1.16.2
+numpy==1.22.0
 oauth==1.0.1
 oauthlib==2.0.6
 pickleshare==0.7.5
